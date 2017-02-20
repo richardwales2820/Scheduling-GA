@@ -365,8 +365,13 @@ public class Search {
 			System.out.println(R + "\t" + "B" + "\t"+ (int)bestOfRunChromo.rawFitness);
 
 			// Now lets see if any of the schedules we have in the population are actually VALID
+			HashSet<String> seen = new HashSet<>();
 			for (int i=0; i<Parameters.popSize; i++)
 			{
+				if (seen.contains(member[i].chromo))
+					continue;
+				seen.add(member[i].chromo);
+				
 				if (is.valid_schedule(member[i]))
 				{
 					System.out.println("================================================================================VALID SCHEDULE================================================================================");
