@@ -139,5 +139,4 @@ public class Scheduling extends FitnessFunction{
 *                             STATIC METHODS                                   *
 *******************************************************************************/
 
-}   // End of OneMax.java ******************************************************
-
+}

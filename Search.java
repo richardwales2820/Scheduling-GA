@@ -364,6 +364,15 @@ public class Search {
 
 			System.out.println(R + "\t" + "B" + "\t"+ (int)bestOfRunChromo.rawFitness);
 
+			// Now lets see if any of the schedules we have in the population are actually VALID
+			for (int i=0; i<Parameters.popSize; i++)
+			{
+				if (is.valid_schedule(member[i]))
+				{
+					System.out.println("================================================================================VALID SCHEDULE================================================================================");
+					problem.doPrintGenes(member[i], summaryOutput);
+				}
+			}
 		} //End of a Run
 
 		Hwrite.left("B", 8, summaryOutput);
