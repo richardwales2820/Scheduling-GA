@@ -47,7 +47,32 @@ public class InputSchedule
         }
     }
 
-    public int gray_to_decimal(String gray)
+    public static String decimal_to_gray(int decimal)
+    {
+        switch (decimal){
+        case 0:
+            return "000";
+        case 1:
+            return "001";
+        case 2:
+            return "011";
+        case 3:
+            return "010";
+        case 4:
+            return "110";
+        case 5:
+            return "111";
+        case 6:
+            return "101";
+        case 7:
+            return "100";
+        default:
+            return "000";
+        }
+
+    }
+
+    public static int gray_to_decimal(String gray)
     {
         int b2 = Character.getNumericValue(gray.charAt(0)); // MSB
         int b1 = Character.getNumericValue(gray.charAt(1)) ^ b2;

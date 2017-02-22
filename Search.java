@@ -70,6 +70,8 @@ public class Search {
 
 	public static void main(String[] args) throws java.io.IOException{
 
+		ArrayList<Chromo> valid_chromo = new ArrayList<>();
+
 		Calendar dateAndTime = Calendar.getInstance(); 
 		Date startTime = dateAndTime.getTime();
 
@@ -117,7 +119,7 @@ public class Search {
 		bestOfRunChromo = new Chromo();
 		bestOverAllChromo = new Chromo();
 
-		InputSchedule is = new InputSchedule("testdata2.txt");
+		InputSchedule is = new InputSchedule(Parameters.dataInputFileName);
 		is.read_preferences();
 
 		if (Parameters.minORmax.equals("max")){
@@ -363,7 +365,7 @@ public class Search {
 			problem.doPrintGenes(bestOfRunChromo, summaryOutput);
 
 			System.out.println(R + "\t" + "B" + "\t"+ (int)bestOfRunChromo.rawFitness);
-
+			
 			// Now lets see if any of the schedules we have in the population are actually VALID
 			HashSet<String> seen = new HashSet<>();
 			for (int i=0; i<Parameters.popSize; i++)
@@ -374,11 +376,31 @@ public class Search {
 				
 				if (is.valid_schedule(member[i]))
 				{
-					System.out.println("================================================================================VALID SCHEDULE================================================================================");
-					problem.doPrintGenes(member[i], summaryOutput);
+					//System.out.println("================================================================================VALID SCHEDULE================================================================================");
+					//problem.doPrintGenes(member[i], summaryOutput);
+					
+					valid_chromo.add(member[i]);
 				}
 			}
 		} //End of a Run
+
+		int valid_num = 0;
+		System.out.println("VALID SCHEDULES FROM ALL RUNS");
+		System.out.println("==============================================================================================================================================================================");
+		HashSet<String> seen_valid = new HashSet<>();
+		for (Chromo c : valid_chromo)
+		{
+			if(seen_valid.contains(c.chromo))
+				continue;
+			seen_valid.add(c.chromo);
+			problem.doRawFitness(c);
+			System.out.println("Fitness: " + c.rawFitness);			
+			problem.doPrintGenes(c, summaryOutput);
+			
+			valid_num++;
+		}
+
+		System.out.println("Valid Solutions: " + valid_num);
 
 		Hwrite.left("B", 8, summaryOutput);
 
