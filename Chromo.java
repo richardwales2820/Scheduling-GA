@@ -146,7 +146,7 @@ public class Chromo
 				// Checks to make sure we didnt mutate into an 8th person. hardcoded to go back to 0
 				if(Scheduling.gray_to_decimal(newGene) == 7) // Change 111 to 100 which i assume is the bad value for you
 				{
-					newGene = "000";
+					newGene = Scheduling.decimal_to_gray((int)Math.random()*7);
 				}
 
 				int afterLocation = chromolist.indexOf(newGene);

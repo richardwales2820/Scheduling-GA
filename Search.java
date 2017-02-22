@@ -133,6 +133,14 @@ public class Search {
 
 		bestOverAllChromo.rawFitness = defaultBest;
 
+
+		// *************************************************************
+        // MY ADDED DATA COLLECTION
+        // *************************************************************
+        double[][] bestFitness = new double[Parameters.numRuns][Parameters.generations];
+        double[][] avgFitness = new double[Parameters.numRuns][Parameters.generations];
+        double[] bestPerRun = new double[Parameters.numRuns];
+
 		//  Start program for multiple runs
 		for (R = 1; R <= Parameters.numRuns; R++){
 
@@ -214,7 +222,9 @@ public class Search {
 							/
 							(Parameters.popSize-1)
 							);
-
+// Save the best, avg, and std. dev for each generation for each run
+                bestFitness[R-1][G] = (double)bestOfGenChromo.rawFitness;
+                avgFitness[R-1][G] = (double)averageRawFitness;
 				// Output generation statistics to screen
 				System.out.println(R + "\t" + G +  "\t" + (int)bestOfGenChromo.rawFitness + "\t" + averageRawFitness + "\t" + stdevRawFitness);
 
@@ -365,7 +375,7 @@ public class Search {
 			problem.doPrintGenes(bestOfRunChromo, summaryOutput);
 
 			System.out.println(R + "\t" + "B" + "\t"+ (int)bestOfRunChromo.rawFitness);
-			
+			bestPerRun[R-1] = (double)bestOfRunChromo.rawFitness;
 			// Now lets see if any of the schedules we have in the population are actually VALID
 			HashSet<String> seen = new HashSet<>();
 			for (int i=0; i<Parameters.popSize; i++)
@@ -423,6 +433,79 @@ public class Search {
 		dateAndTime = Calendar.getInstance(); 
 		Date endTime = dateAndTime.getTime();
 		System.out.println("End  :  " + endTime);
+
+		double[] genAvgBest = new double[Parameters.generations];
+        double[] genAvgAvg = new double[Parameters.generations];
+        double[] genStdDevBest = new double[Parameters.generations];
+        double[] genStdDevAvg = new double[Parameters.generations];
+        double meanBest = 0.0;
+        double stdDevBest = 0.0;
+        double confIntervalLower = 0.0;
+        double confIntervalUpper = 0.0;
+        double zScore = 1.96;
+
+        for (int i = 0; i < Parameters.numRuns; i++)
+        {
+            for (int j = 0; j < Parameters.generations; j++)
+            {
+                genAvgBest[j] += bestFitness[i][j];
+                genAvgAvg[j] += avgFitness[i][j];
+            }
+            meanBest += bestPerRun[i];
+        }
+        meanBest /= Parameters.numRuns;
+
+        for (int i = 0; i < Parameters.generations; i++)
+        {
+            genAvgBest[i] /= (double)Parameters.numRuns;
+            genAvgAvg[i] /= (double)Parameters.numRuns;
+        }
+
+        for (int i = 0; i < Parameters.numRuns; i++)
+        {
+            for (int j = 0; j < Parameters.generations; j++)
+            {
+                genStdDevBest[j] += Math.pow(genAvgBest[j] - bestFitness[i][j], 2);
+                genStdDevAvg[j] += Math.pow(genAvgAvg[j] - avgFitness[i][j], 2);
+            }
+            stdDevBest += Math.pow(bestPerRun[i] - meanBest, 2);
+        }
+        stdDevBest /= Parameters.numRuns;
+        stdDevBest = Math.sqrt(stdDevBest);
+        double rhs = zScore * (stdDevBest/Math.sqrt(Parameters.numRuns));
+        confIntervalLower = meanBest - rhs;
+        confIntervalUpper = meanBest + rhs;
+
+        for (int i = 0; i < Parameters.generations; i++)
+        {
+            genStdDevBest[i] = Math.sqrt(genStdDevBest[i]/(double)Parameters.generations);
+            genStdDevAvg[i] = Math.sqrt(genStdDevAvg[i]/(double)Parameters.generations);
+        }
+
+        FileWriter genAvgBestFile = new FileWriter(new File("genAvgBest.txt"));
+        FileWriter genAvgAvgFile = new FileWriter(new File("genAvgAvg.txt"));
+        FileWriter genStdDevBestFile = new FileWriter(new File("genStdDevBest.txt"));
+        FileWriter genStdDevAvgFile = new FileWriter(new File("genStdDevAvg.txt"));
+        FileWriter bestRunFile = new FileWriter(new File("bestRunData.txt"));
+
+        for (int i = 0; i < Parameters.generations; i++)
+        {
+            genAvgBestFile.write(Double.toString(genAvgBest[i]) + "\n");
+            genAvgAvgFile.write(Double.toString(genAvgAvg[i]) + "\n");
+            genStdDevBestFile.write(Double.toString(genStdDevBest[i]) + "\n");
+            genStdDevAvgFile.write(Double.toString(genStdDevAvg[i]) + "\n");
+        }
+
+        bestRunFile.write("Average best: " + Double.toString(meanBest) + "\n");
+        bestRunFile.write("Std Dev: " + Double.toString(stdDevBest) + "\n");
+        bestRunFile.write("95% Confidence Interval: (" + confIntervalLower + ", " +
+                          confIntervalUpper + ")\n");
+
+        genAvgBestFile.close();
+        genAvgAvgFile.close();
+        genStdDevAvgFile.close();
+        genStdDevBestFile.close();
+        bestRunFile.close();
 
 	} // End of Main Class
 
