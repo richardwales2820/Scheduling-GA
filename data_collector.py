@@ -1,4 +1,3 @@
-import xlwt
 import subprocess
 import os
 import matplotlib.pyplot as plt
@@ -52,4 +51,4 @@ def write_values(filename):
 # compile_run_all()
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-experiment(dir_path + "/", 'Gray Coding')
+experiment(dir_path + "/", 'Gray Final Data Two')

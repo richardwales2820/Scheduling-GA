@@ -1,6 +1,6 @@
 Experiment ID                :scheduling
 Problem Type                 :SC
-Data Input File Name         :finaldata1.txt
+Data Input File Name         :finaldata2.txt
 Number of Runs               :50
 Generations per Run          :200
 Population Size              :300
